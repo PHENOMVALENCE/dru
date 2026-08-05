@@ -1,379 +1,267 @@
 /* ============================================
-   Main JavaScript - Portfolio Functionality
+   Druscilla Kalonga Portfolio — Interactions
    ============================================ */
 
-// Configuration - easily changeable endpoint for backend
-const API_URL = "YOUR_BACKEND_URL";
+(() => {
+  "use strict";
 
-// ============================================
-// Initialize AOS (Animate On Scroll)
-// ============================================
-document.addEventListener('DOMContentLoaded', function() {
-    AOS.init({
-        duration: 800,
-        easing: 'ease-out-cubic',
-        once: true,
-        offset: 100,
-        disable: 'mobile'
-    });
-});
+  const nav = document.getElementById("nav");
+  const navToggle = document.getElementById("nav-toggle");
+  const navLinks = document.getElementById("nav-links");
+  const navBackdrop = document.getElementById("nav-backdrop");
+  const links = document.querySelectorAll(".nav__link");
+  const backToTop = document.getElementById("back-to-top");
+  const yearEl = document.getElementById("year");
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-// ============================================
-// Navigation Functionality
-// ============================================
-const navbar = document.getElementById('navbar');
-const hamburger = document.getElementById('hamburger');
-const navMenu = document.getElementById('nav-menu');
-const navLinks = document.querySelectorAll('.nav-link');
+  if (yearEl) yearEl.textContent = String(new Date().getFullYear());
 
-// Scroll effect for navbar
-window.addEventListener('scroll', function() {
-    if (window.scrollY > 50) {
-        navbar.classList.add('scrolled');
-    } else {
-        navbar.classList.remove('scrolled');
+  /* ---------- Navigation ---------- */
+  function setMenuOpen(open) {
+    navToggle?.classList.toggle("is-open", open);
+    navLinks?.classList.toggle("is-open", open);
+    document.body.classList.toggle("nav-open", open);
+    navToggle?.setAttribute("aria-expanded", String(open));
+    navToggle?.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+
+    if (navBackdrop) {
+      if (open) {
+        navBackdrop.hidden = false;
+        requestAnimationFrame(() => navBackdrop.classList.add("is-visible"));
+      } else {
+        navBackdrop.classList.remove("is-visible");
+        setTimeout(() => {
+          navBackdrop.hidden = true;
+        }, 280);
+      }
     }
-});
+  }
 
-// Mobile menu toggle
-hamburger.addEventListener('click', function() {
-    hamburger.classList.toggle('active');
-    navMenu.classList.toggle('active');
-});
+  navToggle?.addEventListener("click", () => {
+    setMenuOpen(!navLinks?.classList.contains("is-open"));
+  });
 
-// Close mobile menu on link click
-navLinks.forEach(link => {
-    link.addEventListener('click', function() {
-        hamburger.classList.remove('active');
-        navMenu.classList.remove('active');
+  navBackdrop?.addEventListener("click", () => setMenuOpen(false));
+
+  links.forEach((link) => {
+    link.addEventListener("click", () => setMenuOpen(false));
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") setMenuOpen(false);
+  });
+
+  let scrollTicking = false;
+  function onScroll() {
+    if (scrollTicking) return;
+    scrollTicking = true;
+    requestAnimationFrame(() => {
+      const y = window.scrollY;
+      nav?.classList.toggle("is-scrolled", y > 24);
+      backToTop?.classList.toggle("is-visible", y > 480);
+      highlightSection();
+      scrollTicking = false;
     });
-});
+  }
 
-// Active section highlighting
-const sections = document.querySelectorAll('section[id]');
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
 
-function highlightNavigation() {
-    const scrollY = window.pageYOffset;
-    
-    sections.forEach(section => {
-        const sectionHeight = section.offsetHeight;
-        const sectionTop = section.offsetTop - 100;
-        const sectionId = section.getAttribute('id');
-        const navLink = document.querySelector(`.nav-link[href="#${sectionId}"]`);
-        
-        if (navLink) {
-            if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
-                navLinks.forEach(link => link.classList.remove('active'));
-                navLink.classList.add('active');
-            }
-        }
+  backToTop?.addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
+  });
+
+  /* ---------- Active section ---------- */
+  const sections = document.querySelectorAll("section[id]");
+
+  function highlightSection() {
+    const offset = window.scrollY + 120;
+    let current = "";
+
+    sections.forEach((section) => {
+      const top = section.offsetTop;
+      const height = section.offsetHeight;
+      if (offset >= top && offset < top + height) {
+        current = section.id;
+      }
     });
-}
 
-window.addEventListener('scroll', highlightNavigation);
+    links.forEach((link) => {
+      const href = link.getAttribute("href");
+      link.classList.toggle("is-active", href === `#${current}`);
+    });
+  }
 
-// ============================================
-// Typed Text Effect
-// ============================================
-const typedElement = document.getElementById('typed-text');
-const typedTexts = [
-    'Data Analyst',
-    'Excel Specialist',
-    'Dashboard Builder',
-    'Data Enthusiast'
-];
-let textIndex = 0;
-let charIndex = 0;
-let isDeleting = false;
-let typingSpeed = 100;
+  /* ---------- Typed text ---------- */
+  const typedEl = document.getElementById("typed-text");
+  const phrases = [
+    "Excel Specialist",
+    "Dashboard Builder",
+    "Data Enthusiast",
+    "Insight Storyteller",
+  ];
 
-function typeText() {
-    const currentText = typedTexts[textIndex];
-    
-    if (isDeleting) {
-        typedElement.textContent = currentText.substring(0, charIndex - 1);
-        charIndex--;
-        typingSpeed = 50;
-    } else {
-        typedElement.textContent = currentText.substring(0, charIndex + 1);
+  function runTyping() {
+    if (!typedEl || reduceMotion) {
+      if (typedEl) typedEl.textContent = phrases[0];
+      return;
+    }
+
+    let phraseIndex = 0;
+    let charIndex = 0;
+    let deleting = false;
+
+    function tick() {
+      const phrase = phrases[phraseIndex];
+
+      if (!deleting) {
+        typedEl.textContent = phrase.slice(0, charIndex + 1);
         charIndex++;
-        typingSpeed = 100;
-    }
-    
-    if (!isDeleting && charIndex === currentText.length) {
-        isDeleting = true;
-        typingSpeed = 2000; // Pause at end
-    } else if (isDeleting && charIndex === 0) {
-        isDeleting = false;
-        textIndex = (textIndex + 1) % typedTexts.length;
-        typingSpeed = 500; // Pause before next word
-    }
-    
-    setTimeout(typeText, typingSpeed);
-}
-
-// Start typing effect
-document.addEventListener('DOMContentLoaded', function() {
-    if (typedElement) {
-        setTimeout(typeText, 1000);
-    }
-});
-
-// ============================================
-// Counter Animation
-// ============================================
-const counters = document.querySelectorAll('.stat-number');
-let countersAnimated = false;
-
-function animateCounters() {
-    if (countersAnimated) return;
-    
-    counters.forEach(counter => {
-        const target = parseInt(counter.getAttribute('data-target'));
-        const duration = 2000; // 2 seconds
-        const increment = target / (duration / 16); // 60fps
-        let current = 0;
-        
-        const updateCounter = () => {
-            current += increment;
-            if (current < target) {
-                counter.textContent = Math.floor(current);
-                requestAnimationFrame(updateCounter);
-            } else {
-                counter.textContent = target;
-            }
-        };
-        
-        updateCounter();
-    });
-    
-    countersAnimated = true;
-}
-
-// Intersection Observer for counters
-const statsSection = document.querySelector('.stats-grid');
-if (statsSection) {
-    const statsObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                animateCounters();
-                statsObserver.unobserve(entry.target);
-            }
-        });
-    }, { threshold: 0.5 });
-    
-    statsObserver.observe(statsSection);
-}
-
-// ============================================
-// Project Filtering
-// ============================================
-const filterButtons = document.querySelectorAll('.filter-btn');
-const projectCards = document.querySelectorAll('.project-card');
-
-filterButtons.forEach(button => {
-    button.addEventListener('click', function() {
-        // Update active button
-        filterButtons.forEach(btn => btn.classList.remove('active'));
-        this.classList.add('active');
-        
-        const filterValue = this.getAttribute('data-filter');
-        
-        // Filter projects with animation
-        projectCards.forEach(card => {
-            const category = card.getAttribute('data-category');
-            
-            if (filterValue === 'all' || category === filterValue) {
-                card.classList.remove('hidden');
-                card.style.animation = 'fadeInUp 0.5s ease forwards';
-            } else {
-                card.classList.add('hidden');
-            }
-        });
-    });
-});
-
-// ============================================
-// Contact Form Handling
-// ============================================
-const contactForm = document.getElementById('contact-form');
-const formMessage = document.getElementById('form-message');
-
-if (contactForm) {
-    contactForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        // Get form data
-        const formData = {
-            name: document.getElementById('name').value,
-            email: document.getElementById('email').value,
-            subject: document.getElementById('subject').value,
-            message: document.getElementById('message').value
-        };
-        
-        // Validate form
-        if (!validateForm(formData)) {
-            showFormMessage('Please fill in all fields correctly.', 'error');
-            return;
+        if (charIndex === phrase.length) {
+          deleting = true;
+          setTimeout(tick, 1800);
+          return;
         }
-        
-        // Log data to console (as per requirement)
-        console.log('Form Submission Data:', formData);
-        console.log('Would send to:', API_URL);
-        
-        // Show success message
-        showFormMessage('Thank you! Your message has been sent successfully.', 'success');
-        
-        // Reset form
-        contactForm.reset();
-        
-        // Here you would typically send to backend:
-        // sendToBackend(formData);
-    });
-}
-
-function validateForm(data) {
-    // Basic validation
-    if (!data.name.trim() || !data.email.trim() || !data.subject.trim() || !data.message.trim()) {
-        return false;
+        setTimeout(tick, 70);
+      } else {
+        typedEl.textContent = phrase.slice(0, charIndex - 1);
+        charIndex--;
+        if (charIndex === 0) {
+          deleting = false;
+          phraseIndex = (phraseIndex + 1) % phrases.length;
+          setTimeout(tick, 400);
+          return;
+        }
+        setTimeout(tick, 36);
+      }
     }
-    
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(data.email)) {
-        return false;
-    }
-    
-    return true;
-}
 
-function showFormMessage(message, type) {
-    formMessage.textContent = message;
-    formMessage.className = `form-message ${type}`;
-    
-    // Hide message after 5 seconds
+    tick();
+  }
+
+  runTyping();
+
+  /* ---------- Scroll reveal ---------- */
+  function initReveal() {
+    const items = document.querySelectorAll(".reveal");
+    if (!items.length) return;
+
+    if (reduceMotion || !("IntersectionObserver" in window)) {
+      items.forEach((el) => el.classList.add("is-visible"));
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -40px 0px" }
+    );
+
+    items.forEach((el) => observer.observe(el));
+  }
+
+  initReveal();
+
+  /* ---------- Counters ---------- */
+  function animateCount(el) {
+    const target = Number(el.dataset.target || 0);
+    if (!target) return;
+
+    if (reduceMotion) {
+      el.textContent = String(target);
+      return;
+    }
+
+    const duration = 1400;
+    const start = performance.now();
+
+    function frame(now) {
+      const progress = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      el.textContent = String(Math.round(target * eased));
+      if (progress < 1) requestAnimationFrame(frame);
+    }
+
+    requestAnimationFrame(frame);
+  }
+
+  function initCounters() {
+    const counters = document.querySelectorAll(".js-count");
+    if (!counters.length) return;
+
+    if (!("IntersectionObserver" in window)) {
+      counters.forEach(animateCount);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            animateCount(entry.target);
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.5 }
+    );
+
+    counters.forEach((el) => observer.observe(el));
+  }
+
+  initCounters();
+
+  /* ---------- Contact form ---------- */
+  const form = document.getElementById("contact-form");
+  const formMessage = document.getElementById("form-message");
+  const submitBtn = document.getElementById("submit-btn");
+
+  form?.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const name = form.name.value.trim();
+    const email = form.email.value.trim();
+    const subject = form.subject.value.trim();
+    const message = form.message.value.trim();
+
+    formMessage.className = "form-message";
+    formMessage.textContent = "";
+
+    if (!name || !email || !subject || !message) {
+      formMessage.classList.add("is-error");
+      formMessage.textContent = "Please fill in all fields.";
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      formMessage.classList.add("is-error");
+      formMessage.textContent = "Please enter a valid email address.";
+      return;
+    }
+
+    submitBtn?.classList.add("is-loading");
+    const label = submitBtn?.querySelector(".btn__label");
+    if (label) label.textContent = "Sending…";
+
+    // Mailto fallback — replace with your backend endpoint when ready
+    const body = encodeURIComponent(
+      `Name: ${name}\nEmail: ${email}\n\n${message}`
+    );
+    const mailto = `mailto:sunday@topintanzania.com?subject=${encodeURIComponent(subject)}&body=${body}`;
+
     setTimeout(() => {
-        formMessage.className = 'form-message';
-    }, 5000);
-}
-
-// Placeholder function for backend integration
-async function sendToBackend(data) {
-    try {
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
-        
-        if (response.ok) {
-            showFormMessage('Message sent successfully!', 'success');
-            contactForm.reset();
-        } else {
-            showFormMessage('Failed to send message. Please try again.', 'error');
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        showFormMessage('An error occurred. Please try again later.', 'error');
-    }
-}
-
-// ============================================
-// Smooth Scroll for Anchor Links
-// ============================================
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function(e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        
-        if (target) {
-            const headerOffset = 80;
-            const elementPosition = target.getBoundingClientRect().top;
-            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-            
-            window.scrollTo({
-                top: offsetPosition,
-                behavior: 'smooth'
-            });
-        }
-    });
-});
-
-// ============================================
-// Skill Cards Hover Effect Enhancement
-// ============================================
-const skillCards = document.querySelectorAll('.skill-card');
-
-skillCards.forEach(card => {
-    card.addEventListener('mouseenter', function() {
-        this.style.transform = 'translateY(-8px) scale(1.02)';
-    });
-    
-    card.addEventListener('mouseleave', function() {
-        this.style.transform = 'translateY(0) scale(1)';
-    });
-});
-
-// ============================================
-// Intersection Observer for Animations
-// ============================================
-const observerOptions = {
-    root: null,
-    rootMargin: '0px',
-    threshold: 0.1
-};
-
-const animationObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('animate');
-            animationObserver.unobserve(entry.target);
-        }
-    });
-}, observerOptions);
-
-// Observe elements with stagger animation class
-document.querySelectorAll('.stagger-item').forEach(item => {
-    animationObserver.observe(item);
-});
-
-// ============================================
-// Timeline Animation
-// ============================================
-const timelineItems = document.querySelectorAll('.timeline-item');
-
-const timelineObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateX(0)';
-        }
-    });
-}, { threshold: 0.3 });
-
-timelineItems.forEach(item => {
-    item.style.opacity = '0';
-    item.style.transform = item.classList.contains('left') ? 'translateX(-30px)' : 'translateX(30px)';
-    item.style.transition = 'all 0.6s ease';
-    timelineObserver.observe(item);
-});
-
-// ============================================
-// Preloader (Optional Enhancement)
-// ============================================
-window.addEventListener('load', function() {
-    document.body.classList.add('loaded');
-    
-    // Trigger initial animations
-    setTimeout(() => {
-        AOS.refresh();
-    }, 100);
-});
-
-// ============================================
-// Console Easter Egg
-// ============================================
-console.log('%c Welcome to my Portfolio! ', 'background: linear-gradient(135deg, #00D4FF, #7C3AED); color: white; font-size: 20px; padding: 10px 20px; border-radius: 5px;');
-console.log('%c Built with passion for Data Science & ML ', 'color: #00D4FF; font-size: 14px;');
+      window.location.href = mailto;
+      submitBtn?.classList.remove("is-loading");
+      if (label) label.textContent = "Send message";
+      formMessage.classList.add("is-success");
+      formMessage.textContent = "Opening your email client…";
+      form.reset();
+    }, 600);
+  });
+})();
