@@ -1,9 +1,12 @@
 /* ============================================
-   Druscilla Kalonga Portfolio — Interactions
+   Portfolio Interactions — refined motion
    ============================================ */
 
 (() => {
   "use strict";
+
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const finePointer = window.matchMedia("(pointer: fine)").matches;
 
   const nav = document.getElementById("nav");
   const navToggle = document.getElementById("nav-toggle");
@@ -12,7 +15,6 @@
   const links = document.querySelectorAll(".nav__link");
   const backToTop = document.getElementById("back-to-top");
   const yearEl = document.getElementById("year");
-  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   if (yearEl) yearEl.textContent = String(new Date().getFullYear());
 
@@ -40,13 +42,8 @@
   navToggle?.addEventListener("click", () => {
     setMenuOpen(!navLinks?.classList.contains("is-open"));
   });
-
   navBackdrop?.addEventListener("click", () => setMenuOpen(false));
-
-  links.forEach((link) => {
-    link.addEventListener("click", () => setMenuOpen(false));
-  });
-
+  links.forEach((link) => link.addEventListener("click", () => setMenuOpen(false)));
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") setMenuOpen(false);
   });
@@ -71,38 +68,28 @@
     window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
   });
 
-  /* ---------- Active section ---------- */
   const sections = document.querySelectorAll("section[id]");
-
   function highlightSection() {
     const offset = window.scrollY + 120;
     let current = "";
-
     sections.forEach((section) => {
       const top = section.offsetTop;
       const height = section.offsetHeight;
-      if (offset >= top && offset < top + height) {
-        current = section.id;
-      }
+      if (offset >= top && offset < top + height) current = section.id;
     });
-
     links.forEach((link) => {
-      const href = link.getAttribute("href");
-      link.classList.toggle("is-active", href === `#${current}`);
+      link.classList.toggle("is-active", link.getAttribute("href") === `#${current}`);
     });
   }
 
   /* ---------- Typed text ---------- */
   const typedEl = document.getElementById("typed-text");
-  const phrases = [
-    "Excel Specialist",
-    "Dashboard Builder",
-    "Data Enthusiast",
-  ];
+  const phrases = ["Excel Specialist", "Dashboard Builder", "Data Enthusiast"];
 
   function runTyping() {
-    if (!typedEl || reduceMotion) {
-      if (typedEl) typedEl.textContent = phrases[0];
+    if (!typedEl) return;
+    if (reduceMotion) {
+      typedEl.textContent = phrases[0];
       return;
     }
 
@@ -112,7 +99,6 @@
 
     function tick() {
       const phrase = phrases[phraseIndex];
-
       if (!deleting) {
         typedEl.textContent = phrase.slice(0, charIndex + 1);
         charIndex++;
@@ -134,7 +120,6 @@
         setTimeout(tick, 36);
       }
     }
-
     tick();
   }
 
@@ -159,7 +144,7 @@
           }
         });
       },
-      { threshold: 0.12, rootMargin: "0px 0px -40px 0px" }
+      { threshold: 0.12, rootMargin: "0px 0px -36px 0px" }
     );
 
     items.forEach((el) => observer.observe(el));
@@ -170,14 +155,14 @@
   /* ---------- Counters ---------- */
   function animateCount(el) {
     const target = Number(el.dataset.target || 0);
-    if (!target) return;
+    if (!target && target !== 0) return;
 
     if (reduceMotion) {
       el.textContent = String(target);
       return;
     }
 
-    const duration = 1100;
+    const duration = 1200;
     const start = performance.now();
 
     function frame(now) {
@@ -208,7 +193,7 @@
           }
         });
       },
-      { threshold: 0.5 }
+      { threshold: 0.45 }
     );
 
     counters.forEach((el) => observer.observe(el));
@@ -216,51 +201,98 @@
 
   initCounters();
 
-  /* ---------- Contact form ---------- */
-  const form = document.getElementById("contact-form");
-  const formMessage = document.getElementById("form-message");
-  const submitBtn = document.getElementById("submit-btn");
+  /* ---------- Magnetic buttons ---------- */
+  function initMagnetic() {
+    if (reduceMotion || !finePointer) return;
 
-  form?.addEventListener("submit", (e) => {
-    e.preventDefault();
+    document.querySelectorAll(".js-magnetic").forEach((btn) => {
+      const strength = 0.28;
+      btn.addEventListener("pointermove", (e) => {
+        const rect = btn.getBoundingClientRect();
+        const x = e.clientX - rect.left - rect.width / 2;
+        const y = e.clientY - rect.top - rect.height / 2;
+        btn.style.setProperty("--mx", `${x * strength}px`);
+        btn.style.setProperty("--my", `${y * strength}px`);
+      });
+      btn.addEventListener("pointerleave", () => {
+        btn.style.setProperty("--mx", "0px");
+        btn.style.setProperty("--my", "0px");
+      });
+    });
 
-    const name = form.name.value.trim();
-    const email = form.email.value.trim();
-    const subject = form.subject.value.trim();
-    const message = form.message.value.trim();
+    document.querySelectorAll(".js-magnetic-soft").forEach((card) => {
+      const strength = 0.12;
+      card.addEventListener("pointermove", (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left - rect.width / 2;
+        const y = e.clientY - rect.top - rect.height / 2;
+        card.style.transform = `translate(${x * strength}px, ${y * strength - 4}px)`;
+      });
+      card.addEventListener("pointerleave", () => {
+        card.style.transform = "";
+      });
+    });
+  }
 
-    formMessage.className = "form-message";
-    formMessage.textContent = "";
+  initMagnetic();
 
-    if (!name || !email || !subject || !message) {
-      formMessage.classList.add("is-error");
-      formMessage.textContent = "Please fill in all fields.";
-      return;
-    }
+  /* ---------- Tilt / mouse tracking ---------- */
+  function initTilt() {
+    if (reduceMotion || !finePointer) return;
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      formMessage.classList.add("is-error");
-      formMessage.textContent = "Please enter a valid email address.";
-      return;
-    }
+    document.querySelectorAll(".js-tilt").forEach((el) => {
+      const max = Number(el.dataset.tiltMax || 8);
 
-    submitBtn?.classList.add("is-loading");
-    const label = submitBtn?.querySelector(".btn__label");
-    if (label) label.textContent = "Sending…";
+      el.addEventListener("pointermove", (e) => {
+        const rect = el.getBoundingClientRect();
+        const px = (e.clientX - rect.left) / rect.width;
+        const py = (e.clientY - rect.top) / rect.height;
+        const rx = (0.5 - py) * max;
+        const ry = (px - 0.5) * max;
+        el.style.transform = `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) translateZ(0)`;
+      });
 
-    // Mailto fallback — replace with your backend endpoint when ready
-    const body = encodeURIComponent(
-      `Name: ${name}\nEmail: ${email}\n\n${message}`
+      el.addEventListener("pointerleave", () => {
+        el.style.transform = "";
+      });
+    });
+  }
+
+  initTilt();
+
+  /* ---------- Soft parallax orbs ---------- */
+  function initParallax() {
+    if (reduceMotion || !finePointer) return;
+
+    const orbs = document.querySelectorAll(".hero__bg-orb, .hero__accent");
+    if (!orbs.length) return;
+
+    let mx = 0;
+    let my = 0;
+    let cx = 0;
+    let cy = 0;
+
+    window.addEventListener(
+      "pointermove",
+      (e) => {
+        mx = (e.clientX / window.innerWidth - 0.5) * 2;
+        my = (e.clientY / window.innerHeight - 0.5) * 2;
+      },
+      { passive: true }
     );
-    const mailto = `mailto:sunday@topintanzania.com?subject=${encodeURIComponent(subject)}&body=${body}`;
 
-    setTimeout(() => {
-      window.location.href = mailto;
-      submitBtn?.classList.remove("is-loading");
-      if (label) label.textContent = "Send message";
-      formMessage.classList.add("is-success");
-      formMessage.textContent = "Opening your email client…";
-      form.reset();
-    }, 600);
-  });
+    function loop() {
+      cx += (mx - cx) * 0.06;
+      cy += (my - cy) * 0.06;
+      orbs.forEach((orb, i) => {
+        const depth = (i % 2 === 0 ? 12 : 8) + i * 2;
+        orb.style.transform = `translate(${cx * depth}px, ${cy * depth}px)`;
+      });
+      requestAnimationFrame(loop);
+    }
+
+    requestAnimationFrame(loop);
+  }
+
+  initParallax();
 })();
