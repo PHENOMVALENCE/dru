@@ -14,6 +14,8 @@
   const navBackdrop = document.getElementById("nav-backdrop");
   const links = document.querySelectorAll(".nav__link");
   const backToTop = document.getElementById("back-to-top");
+  const progress = document.getElementById("progress");
+  const floatCta = document.getElementById("float-cta");
   const yearEl = document.getElementById("year");
 
   if (yearEl) yearEl.textContent = String(new Date().getFullYear());
@@ -54,8 +56,13 @@
     scrollTicking = true;
     requestAnimationFrame(() => {
       const y = window.scrollY;
+      const docH = document.documentElement.scrollHeight - window.innerHeight;
       nav?.classList.toggle("is-scrolled", y > 24);
       backToTop?.classList.toggle("is-visible", y > 480);
+      floatCta?.classList.toggle("is-visible", y > 700 && y < docH - 400);
+      if (progress && docH > 0) {
+        progress.style.width = `${Math.min(100, (y / docH) * 100)}%`;
+      }
       highlightSection();
       scrollTicking = false;
     });

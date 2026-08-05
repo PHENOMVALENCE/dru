@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Druscilla Kalonga — Data Analyst specializing in Excel dashboards, data cleaning, and turning operational data into clear business insights.">
   <meta name="author" content="Druscilla Jerome Kalonga">
-  <meta name="theme-color" content="#0A0F1C">
+  <meta name="theme-color" content="#0F172A">
 
   <!-- Open Graph -->
   <meta property="og:type" content="website">
@@ -26,7 +26,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="css/style.css">
 
@@ -52,14 +52,7 @@
   </script>
 </head>
 <body>
-  <!-- Atmosphere -->
-  <div class="bg-atmosphere" aria-hidden="true">
-    <div class="bg-atmosphere__grid"></div>
-    <div class="bg-atmosphere__glow bg-atmosphere__glow--1"></div>
-    <div class="bg-atmosphere__glow bg-atmosphere__glow--2"></div>
-    <div class="bg-atmosphere__glow bg-atmosphere__glow--3"></div>
-    <div class="bg-atmosphere__noise"></div>
-  </div>
+  <div class="progress" id="progress" aria-hidden="true"></div>
 
   <!-- Navigation -->
   <header class="nav" id="nav">
@@ -176,15 +169,14 @@
       </a>
     </section>
 
-    <hr class="section-divider" aria-hidden="true">
-
     <!-- About -->
-    <section class="section section--band" id="about">
+    <section class="section theme-light" id="about">
       <div class="container">
         <div class="section-header reveal">
           <p class="section-eyebrow">About</p>
           <h2 class="section-title">Building clarity from messy data</h2>
           <p class="section-desc">A data professional who understands the gap between academic projects and real workplace datasets.</p>
+          <div class="section-rule" aria-hidden="true"></div>
         </div>
 
         <div class="about__grid">
@@ -288,15 +280,14 @@
       </div>
     </section>
 
-    <hr class="section-divider" aria-hidden="true">
-
     <!-- Experience -->
-    <section class="section section--mesh" id="experience">
+    <section class="section theme-muted" id="experience">
       <div class="container">
         <div class="section-header reveal">
           <p class="section-eyebrow">Experience</p>
           <h2 class="section-title">Where I’ve applied the craft</h2>
           <p class="section-desc">Roles spanning analytics internships, operations leadership, and community building.</p>
+          <div class="section-rule" aria-hidden="true"></div>
         </div>
 
         <div class="experience__list">
@@ -422,19 +413,18 @@
       </div>
     </section>
 
-    <hr class="section-divider" aria-hidden="true">
-
     <!-- Projects -->
-    <section class="section section--band" id="projects">
+    <section class="section theme-dark" id="projects">
       <div class="container">
         <div class="section-header reveal">
           <p class="section-eyebrow">Projects</p>
           <h2 class="section-title">Selected work</h2>
           <p class="section-desc">Real operational problems — solved with structured data, clear visuals, and measurable outcomes.</p>
+          <div class="section-rule" aria-hidden="true"></div>
         </div>
 
         <div class="projects__list">
-          <!-- Featured -->
+          <!-- Featured editorial -->
           <article class="project project--featured reveal">
             <div class="project__media">
               <img
@@ -493,7 +483,7 @@
             </div>
           </article>
 
-          <article class="project project--reverse reveal">
+          <article class="project project--reverse project--card reveal">
             <div class="project__media">
               <img
                 src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1400&h=875&fit=crop&q=85"
@@ -602,15 +592,14 @@
       </div>
     </section>
 
-    <hr class="section-divider" aria-hidden="true">
-
     <!-- Skills / Tools -->
-    <section class="section section--mesh" id="skills">
+    <section class="section theme-light" id="skills">
       <div class="container">
         <div class="section-header reveal">
           <p class="section-eyebrow">Tools &amp; stack</p>
           <h2 class="section-title">Tools I use with intent</h2>
           <p class="section-desc">Categorized by how I actually work — not a laundry list of logos.</p>
+          <div class="section-rule" aria-hidden="true"></div>
         </div>
 
         <div class="skills__categories">
@@ -765,15 +754,14 @@
       </div>
     </section>
 
-    <hr class="section-divider" aria-hidden="true">
-
     <!-- Education -->
-    <section class="section section--band" id="education">
+    <section class="section theme-muted" id="education">
       <div class="container">
         <div class="section-header reveal">
           <p class="section-eyebrow">Education</p>
           <h2 class="section-title">Academic foundation</h2>
           <p class="section-desc">Statistics, science, and the analytical habits behind every dashboard.</p>
+          <div class="section-rule" aria-hidden="true"></div>
         </div>
 
         <div class="edu__rail">
@@ -816,15 +804,14 @@
       </div>
     </section>
 
-    <hr class="section-divider" aria-hidden="true">
-
     <!-- Results -->
-    <section class="section section--mesh" id="achievements">
+    <section class="section theme-dark" id="achievements">
       <div class="container">
         <div class="section-header section-header--center reveal">
           <p class="section-eyebrow">Impact</p>
           <h2 class="section-title">Results that matter</h2>
           <p class="section-desc">Outcomes from real operational contexts — not vanity metrics.</p>
+          <div class="section-rule" aria-hidden="true"></div>
         </div>
 
         <div class="achievements__grid">
@@ -863,10 +850,8 @@
       </div>
     </section>
 
-    <hr class="section-divider" aria-hidden="true">
-
     <!-- Contact -->
-    <section class="section section--cta contact--cta" id="contact">
+    <section class="section theme-light contact--cta" id="contact">
       <div class="container">
         <div class="section-header reveal">
           <p class="section-eyebrow">Contact</p>
@@ -875,6 +860,7 @@
             Whether you need cleaner reporting, a practical dashboard, or an analyst
             who understands operations — I’d love to hear from you.
           </p>
+          <div class="section-rule" aria-hidden="true"></div>
         </div>
 
         <div class="contact__cards">
@@ -959,10 +945,15 @@
       </div>
       <div class="footer__bottom">
         <p>&copy; <span id="year">2026</span> Druscilla Kalonga. All rights reserved.</p>
-        <p class="footer__built">Crafted with <span>intention</span> · Inter · CSS</p>
+        <p class="footer__built">Crafted with <span>intention</span> · Manrope · CSS</p>
       </div>
     </div>
   </footer>
+
+  <div class="float-cta" id="float-cta" aria-hidden="true">
+    <span>Available for collaborations</span>
+    <a href="#contact" class="btn btn--primary">Let’s talk</a>
+  </div>
 
   <button class="back-to-top" id="back-to-top" aria-label="Back to top" type="button">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg>
