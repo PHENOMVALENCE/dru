@@ -1,11 +1,10 @@
 {
-  "name": "data-scientist-portfolio",
-  "version": "1.0.0",
+  "name": "druscilla-kalonga-portfolio",
+  "version": "2.0.0",
   "private": true,
-  "description": "Premium Data Analyst Portfolio Website",
+  "description": "Premium Data Analyst Portfolio — Druscilla Kalonga",
   "scripts": {
     "dev": "npx serve . -p 3000",
-    "build": "echo 'Static site - no build required'",
     "start": "npx serve . -p 3000"
   },
   "devDependencies": {
