@@ -98,7 +98,6 @@
     "Excel Specialist",
     "Dashboard Builder",
     "Data Enthusiast",
-    "Insight Storyteller",
   ];
 
   function runTyping() {
@@ -178,7 +177,7 @@
       return;
     }
 
-    const duration = 1400;
+    const duration = 1100;
     const start = performance.now();
 
     function frame(now) {
